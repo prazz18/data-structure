@@ -1,0 +1,45 @@
+
+struct segment {
+	int sum;
+	void merge(segment l, segment r) {
+		sum = l.sum + r.sum;
+	}
+} t[4 * 200200];
+void build(int node, int st, int end) {
+	if (st == end) {
+		t[node].sum = a[st];
+		return;
+	}
+	int mid = (st + end) >> 1;
+	build(2 * node, st, mid);
+	build(2 * node + 1, mid + 1, end);
+	
+	// merge logic --> 
+	t[node].merge(t[2 * node], t[2 * node + 1]);
+}
+
+void update(int node, int st, int end, int pos, int x) {
+	if (pos < st || pos > end)return;
+	if (st == end) {
+		t[node].sum = x;
+		a[pos] = x;
+		return;
+	}
+	int mid = (st + end) >> 1;
+	update(2 * node, st, mid, pos, x);
+	update(2 * node + 1, mid + 1, end, pos, x);
+
+	t[node].merge(t[2 * node], t[2 * node + 1]);
+}
+
+segment query(int node, int st, int end, int l, int r) {
+	if (l > end || r < st)return {0};
+	if (st >= l && end <= r)return t[node];
+
+	int mid = (st + end) >> 1;
+
+	// temporary segment variable for storing the ans ---> 
+	segment ans;
+	ans.merge(query(2 * node, st, mid, l, r), query(2 * node + 1, mid + 1, end, l, r));
+	return ans;
+}
